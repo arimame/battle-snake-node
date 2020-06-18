@@ -140,6 +140,20 @@ function findAvailableMoves(head, position, height, width, snakes) {
   return freeSpaces;
 }
 
+function findNearestFood(head, food) {
+  var nearestFood;
+  var shortestDistance;
+
+  for(var item of food) {
+    var distance = Math.sqrt(Math.pow((head.x-item.x), 2) + Math.pow((head.y - item.y), 2));
+    if(distance < shortestDistance || shortestDistance === undefined) {
+      shortestDistance = distance;
+      nearestFood = item;
+    }
+  }
+  return  nearestFood
+}
+
 function handleMove(request, response) {
   var gameData = request.body
 
@@ -152,6 +166,8 @@ function handleMove(request, response) {
   var health = gameData.you.health;
 
   var possibleMoves = findAvailableMoves(head, position, height, width, snakes);
+
+  var targetFood = findNearestFood(head, food);
   
   var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
 
