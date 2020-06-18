@@ -154,6 +154,25 @@ function findNearestFood(head, food) {
   return  nearestFood
 }
 
+function goToFood(moves, food, position) {
+  directionOfFood = [];
+  if(position.x > food.x) {
+    directionOfFood.push("left");
+  }
+  if(position.x < food.x) {
+    directionOfFood.push("right");
+  }
+  if(position.y < food.y) {
+    directionOfFood.push("up");
+  }
+   if(position.y > food.y) {
+    directionOfFood.push("down");
+  }
+  
+  const bestMoves = moves.filter(element => directionOfFood.includes(element));
+  return bestMoves;
+}
+
 function handleMove(request, response) {
   var gameData = request.body
 
@@ -166,11 +185,16 @@ function handleMove(request, response) {
   var health = gameData.you.health;
 
   var possibleMoves = findAvailableMoves(head, position, height, width, snakes);
-
   var targetFood = findNearestFood(head, food);
-  
-  var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
+  var bestMoves = goToFood(possibleMoves, targetFood, head);
+  var move = "";
 
+  if(bestMoves.length !== 0) {
+    move = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+  } else {
+    move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  }
+  
   console.log('MOVE: ' + move)
   response.status(200).send({
     move: move
