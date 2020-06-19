@@ -27,91 +27,99 @@ function handleIndex(request, response) {
 
 function handleStart(request, response) {
   var gameData = request.body
+  console.lo
 
   console.log('START')
   response.status(200).send('ok')
 }
 
+function checkY(newPosition, head, position, snakes) {
+  var match = false;
+
+  //loops through own body to see if moving up will cause a collision
+  for(var square of position) {
+    if(square.x === head.x && square.y === newPosition.target) {
+      match = true;
+      return match;
+    }
+  }
+
+  //loop through each snake
+  for(var snake of snakes) {
+    if(position.length <= snake.body.length) {
+      var otherSnakeHead = snake.head
+      if(((otherSnakeHead.x === head.x) && (otherSnakeHead.y === newPosition.dangerZoneAcross)) || ((otherSnakeHead.x === newPosition.dangerZoneRight) || (otherSnakeHead.x === newPosition.dangerZoneLeft) && (otherSnakeHead.y === newPosition.target))) {
+        match = true;
+        return match;
+      }     
+    }
+
+    for(var square of snake.body) {
+      if(square.x === head.x && square.y === newPosition.target) {
+        match = true;
+        return match;
+      }
+    }
+  }
+  return match;
+}
+
+function checkX(newPosition, head, position, snakes) {
+  var match = false;
+  for(var square of position) {
+    if(square.x === newPosition.target && square.y === head.y) {
+      match = true;
+      return match
+    }
+  }
+  for(var snake of snakes) {
+    if(position.length <= snake.body.length) {
+      var otherSnakeHead = snake.head
+      if(((otherSnakeHead.x === newPosition.dangerZoneAcross) && (otherSnakeHead.y === head.y)) || ((otherSnakeHead.x === newPosition.target) && ((otherSnakeHead.y === newPosition.dangerZoneUp) || (otherSnakeHead.y === newPosition.dangerZoneDown)))) {
+        match = true;
+        return match;
+      }     
+    }
+    for(var square of snake.body) {
+      if(square.x === newPosition.target && square.y === head.y) {
+        match = true;
+        return match;
+      }
+    } 
+  }
+  return match;
+}
+
 function findAvailableMoves(head, position, height, width, snakes) {
   var freeSpaces = [];
 
-  function checkUp() {
-    var match = false;
-    //loops through own body to see if moving up will cause a collision
-    for(var square of position) {
-      //one is added to the head.y because that would be new positon of head if the snake moved up
-      if(square.x === head.x && square.y === (head.y + 1)) {
-        match = true;
-      }
-    }
-    //loop through each snake
-    for(var snake of snakes) {
-      //loop through each snakes position
-      for(var square of snake.body) {
-        if(square.x === head.x && square.y === (head.y + 1)) {
-          match = true;
-        }
-      }
-    }
-     
-    return match;
-  }
+  //possible moves from current spot
+  var up = {
+    target: (head.y + 1),
+    dangerZoneAcross:(head.y + 2),
+    dangerZoneRight: (head.x + 1),
+    dangerZoneLeft:  (head.x - 1),
+  };
+  var down =   {
+    target: (head.y - 1),
+    dangerZoneAcross:(head.y - 2),
+    dangerZoneRight: (head.x + 1),
+    dangerZoneLeft:  (head.x - 1),
+  };
+  var right =  {
+    target: (head.x + 1),
+    dangerZoneAcross:(head.x + 2),
+    dangerZoneUp: (head.y + 1),
+    dangerZoneDown:  (head.y - 1),
+  };
+  var left = {
+    target: (head.x - 1),
+    dangerZoneAcross:(head.x - 2),
+    dangerZoneUp: (head.y + 1),
+    dangerZoneDown: (head.y - 1),
+  };
 
-  function checkDown() {
-    var match = false;
-    for(var square of position) {
-      if(square.x === head.x && square.y === (head.y - 1)) {
-        match = true;
-      }
-    }
-
-    for(var snake of snakes) {
-      for(var square of snake.body) {
-        if(square.x === head.x && square.y === (head.y - 1)) {
-          match = true;
-        }
-      }
-    }
-    
-    return match;
-  }
-
-  function checkRight() {
-    var match = false;
-    for(var square of position) {
-      if(square.x === (head.x + 1) && square.y === head.y) {
-        match = true;
-      }
-    }
-    for(var snake of snakes) {
-      for(var square of snake.body) {
-        if(square.x === (head.x + 1) && square.y === head.y) {
-          match = true;
-        }
-      } 
-    }
-    return match;
-  }
-
-  function checkLeft() {
-    var match = false;
-    for(var square of position) {
-      if(square.x === (head.x - 1) && square.y === head.y) {
-        match = true;
-      }
-    }
-    for (var snake of snakes) {
-      for(var square of snake.body) {
-        if(square.x === (head.x - 1) && square.y === head.y) {
-          match = true;
-        }
-      }
-    }
-    
-    return match;
-  }
-
-  if(!checkUp()) {
+  if(!checkY(up, head, position, snakes)) {
     //checks if moving up would result in being out of bounds
     if(head.y !== (height - 1)) {
       // if not push up to the free spaces array
@@ -119,19 +127,19 @@ function findAvailableMoves(head, position, height, width, snakes) {
     }
   }
 
-  if(!checkDown()) {
+  if(!checkY(down, head, position, snakes)) {
     if(head.y !== 0) {
       freeSpaces.push("down");
     }
   }
 
-  if(!checkRight()) {
+  if(!checkX(right, head, position, snakes)) {
     if(head.x !== (width - 1)) {
       freeSpaces.push("right");
     }
   }
 
-  if(!checkLeft()) {
+  if(!checkX(left, head, position, snakes)) {
     if(head.x !== 0) {
       freeSpaces.push("left");
     }
@@ -178,6 +186,7 @@ function handleMove(request, response) {
 
   var head = gameData.you.head;
   var position = gameData.you.body;
+  var length = gameData.you.body.length;
   var height = gameData.board.height;
   var width = gameData.board.width;
   var food = gameData.board.food;
