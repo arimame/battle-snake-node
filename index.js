@@ -45,14 +45,6 @@ function checkY(newPosition, head, position, snakes) {
 
   //loop through each snake
   for(var snake of snakes) {
-    if(position.length <= snake.body.length) {
-      var otherSnakeHead = snake.head
-      if(((otherSnakeHead.x === head.x) && (otherSnakeHead.y === newPosition.dangerZoneAcross)) || ((otherSnakeHead.x === newPosition.dangerZoneRight) || (otherSnakeHead.x === newPosition.dangerZoneLeft) && (otherSnakeHead.y === newPosition.target))) {
-        match = true;
-        return match;
-      }     
-    }
-
     for(var square of snake.body) {
       if(square.x === head.x && square.y === newPosition.target) {
         match = true;
@@ -72,13 +64,6 @@ function checkX(newPosition, head, position, snakes) {
     }
   }
   for(var snake of snakes) {
-    if(position.length <= snake.body.length) {
-      var otherSnakeHead = snake.head
-      if(((otherSnakeHead.x === newPosition.dangerZoneAcross) && (otherSnakeHead.y === head.y)) || ((otherSnakeHead.x === newPosition.target) && ((otherSnakeHead.y === newPosition.dangerZoneUp) || (otherSnakeHead.y === newPosition.dangerZoneDown)))) {
-        match = true;
-        return match;
-      }     
-    }
     for(var square of snake.body) {
       if(square.x === newPosition.target && square.y === head.y) {
         match = true;
