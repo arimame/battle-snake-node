@@ -27,7 +27,6 @@ function handleIndex(request, response) {
 
 function handleStart(request, response) {
   var gameData = request.body
-  console.lo
 
   console.log('START')
   response.status(200).send('ok')
