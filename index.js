@@ -34,21 +34,40 @@ function handleStart(request, response) {
 
 function checkY(newPosition, head, position, snakes) {
   var match = false;
-
+  var i = 0;
   //loops through own body to see if moving up will cause a collision
   for(var square of position) {
-    if(square.x === head.x && square.y === newPosition.target) {
-      match = true;
-      return match;
+    if((position.length - 1) !== i) {
+      if(square.x === head.x && square.y === newPosition.target) {
+        match = true;
+      }
+      if((square.x === head.x) && (square.y === newPosition.dangerZoneAcross)) {
+        match = true;
+      }
+      if((square.x === head.x) && (square.y === newPosition.dangerZoneAcross+ 1)) {
+        match = true;
+      }
     }
+   i++;
   }
 
   //loop through each snake
   for(var snake of snakes) {
+    if(position.length <= snake.body.length) {
+      var otherSnakeHead = snake.head
+      if((otherSnakeHead.x === head.x) && (otherSnakeHead.y === newPosition.dangerZoneAcross)) {
+        match = true;
+      }
+      if((otherSnakeHead.x === newPosition.dangerZoneRight)  && (otherSnakeHead.y === newPosition.target)) {
+        match = true;
+      }
+      if((otherSnakeHead.x === newPosition.dangerZoneLeft)  && (otherSnakeHead.y === newPosition.target)) {
+        match = true;
+      }
+    }
     for(var square of snake.body) {
       if(square.x === head.x && square.y === newPosition.target) {
         match = true;
-        return match;
       }
     }
   }
@@ -56,18 +75,38 @@ function checkY(newPosition, head, position, snakes) {
 }
 
 function checkX(newPosition, head, position, snakes) {
-  var match = false;
+var match = false;
+  var i = 0;
   for(var square of position) {
-    if(square.x === newPosition.target && square.y === head.y) {
-      match = true;
-      return match
+    if((position.length - 1) !== i) {
+      if(square.x === newPosition.target && square.y === head.y) {
+        match = true;
+      }
+      if((square.x === newPosition.dangerZoneAcross) && (square.y === head.y)) {
+        match = true;
+      } 
+      if((square.x === newPosition.dangerZoneAcross + 1) && (square.y === head.y)) {
+        match = true;
+      } 
     }
+    i++;
   }
   for(var snake of snakes) {
+    if(position.length <= snake.body.length) {
+      var otherSnakeHead = snake.head
+      if((otherSnakeHead.x === newPosition.dangerZoneAcross) && (otherSnakeHead.y === head.y)) {
+        match = true;
+      } 
+      if((otherSnakeHead.x === newPosition.target) && (otherSnakeHead.y === newPosition.dangerZoneUp)) {
+        match = true;
+      } 
+      if((otherSnakeHead.x === newPosition.target) && (otherSnakeHead.y === newPosition.dangerZoneDown)){
+        match = true;
+      }   
+    }
     for(var square of snake.body) {
       if(square.x === newPosition.target && square.y === head.y) {
         match = true;
-        return match;
       }
     } 
   }
@@ -187,7 +226,7 @@ function handleMove(request, response) {
   } else {
     move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
   }
-  
+
   console.log('MOVE: ' + move)
   response.status(200).send({
     move: move
