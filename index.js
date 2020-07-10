@@ -33,111 +33,103 @@ function handleStart(request, response) {
 }
 
 function checkY(newPosition, head, position, snakes) {
-  var match = false;
-  var i = 0;
-  //loops through own body to see if moving up will cause a collision
-  for(var square of position) {
-    if((position.length - 1) !== i) {
-      if(square.x === head.x && square.y === newPosition.target) {
-        match = true;
-      }
-      if((square.x === head.x) && (square.y === newPosition.dangerZoneAcross)) {
-        match = true;
-      }
-      if((square.x === head.x) && (square.y === newPosition.dangerZoneAcross+ 1)) {
-        match = true;
+  let snakesIndex = 0;
+  //loops through own body to see if moving to the target postion will cause a collision
+  for(const square of position) {
+    // if the current snake part is the tail, don't check for collisions
+    if((position.length - 1) !== snakesIndex) {
+      if((square.x === head.x) && 
+      ((square.y === newPosition.target) || 
+      (square.y === newPosition.dangerZoneAcross) ||
+      (square.y === newPosition.dangerZoneAcross + 1))) {
+        return true;
       }
     }
-   i++;
+    snakesIndex ++;
   }
 
   //loop through each snake
-  for(var snake of snakes) {
+  for(const snake of snakes) {
+    //if my snake is shorter than the current state, avoid collisions
     if(position.length <= snake.body.length) {
-      var otherSnakeHead = snake.head
+      const otherSnakeHead = snake.head;
       if((otherSnakeHead.x === head.x) && (otherSnakeHead.y === newPosition.dangerZoneAcross)) {
-        match = true;
+        return true;
       }
-      if((otherSnakeHead.x === newPosition.dangerZoneRight)  && (otherSnakeHead.y === newPosition.target)) {
-        match = true;
-      }
-      if((otherSnakeHead.x === newPosition.dangerZoneLeft)  && (otherSnakeHead.y === newPosition.target)) {
-        match = true;
+      if(((otherSnakeHead.x === newPosition.dangerZoneRight) || (otherSnakeHead.x === newPosition.dangerZoneLeft)) && (otherSnakeHead.y === newPosition.target)) {
+        return true;
       }
     }
-    for(var square of snake.body) {
+    for(const square of snake.body) {
       if(square.x === head.x && square.y === newPosition.target) {
-        match = true;
+        return true;
       }
     }
   }
-  return match;
+  return false
 }
 
 function checkX(newPosition, head, position, snakes) {
-var match = false;
-  var i = 0;
-  for(var square of position) {
-    if((position.length - 1) !== i) {
-      if(square.x === newPosition.target && square.y === head.y) {
-        match = true;
+  let snakesIndex = 0;
+
+  //loops through own body to see if moving to the target postion will cause a collision
+  for(const square of position) {
+    if((position.length - 1) !== snakesIndex) {
+      if((square.y === head.y) && 
+      ((square.x === newPosition.target) || 
+      (square.x === newPosition.dangerZoneAcross) ||
+      (square.x === newPosition.dangerZoneAcross + 1))) {
+        return true;
       }
-      if((square.x === newPosition.dangerZoneAcross) && (square.y === head.y)) {
-        match = true;
-      } 
-      if((square.x === newPosition.dangerZoneAcross + 1) && (square.y === head.y)) {
-        match = true;
-      } 
     }
-    i++;
+    snakesIndex++;
   }
-  for(var snake of snakes) {
+
+  //loop through each snake
+  for(const snake of snakes) {
     if(position.length <= snake.body.length) {
-      var otherSnakeHead = snake.head
-      if((otherSnakeHead.x === newPosition.dangerZoneAcross) && (otherSnakeHead.y === head.y)) {
-        match = true;
-      } 
-      if((otherSnakeHead.x === newPosition.target) && (otherSnakeHead.y === newPosition.dangerZoneUp)) {
-        match = true;
-      } 
-      if((otherSnakeHead.x === newPosition.target) && (otherSnakeHead.y === newPosition.dangerZoneDown)){
-        match = true;
-      }   
+     const otherSnakeHead = snake.head;
+      if((otherSnakeHead.y === head.y) && (otherSnakeHead.x === newPosition.dangerZoneAcross)) {
+        return true;
+      }
+      if(((otherSnakeHead.y === newPosition.dangerZoneUp) || (otherSnakeHead.y === newPosition.dangerZoneDown)) && (otherSnakeHead.x === newPosition.target)) {
+        return true;
+      }
     }
-    for(var square of snake.body) {
+    for(const square of snake.body) {
       if(square.x === newPosition.target && square.y === head.y) {
-        match = true;
+        return true;
       }
     } 
   }
-  return match;
+  return false;
 }
 
 function findAvailableMoves(head, position, height, width, snakes) {
-  var freeSpaces = [];
+  let freeSpaces = [];
 
   //possible moves from current spot
-  var up = {
+  const up = {
     target: (head.y + 1),
-    dangerZoneAcross:(head.y + 2),
+    dangerZoneAcross: (head.y + 2),
     dangerZoneRight: (head.x + 1),
     dangerZoneLeft:  (head.x - 1),
   };
-  var down =   {
+ const down =   {
     target: (head.y - 1),
-    dangerZoneAcross:(head.y - 2),
+    dangerZoneAcross: (head.y - 2),
     dangerZoneRight: (head.x + 1),
     dangerZoneLeft:  (head.x - 1),
   };
-  var right =  {
+  const right =  {
     target: (head.x + 1),
-    dangerZoneAcross:(head.x + 2),
+    dangerZoneAcross: (head.x + 2),
     dangerZoneUp: (head.y + 1),
     dangerZoneDown:  (head.y - 1),
   };
-  var left = {
+  const left = {
     target: (head.x - 1),
-    dangerZoneAcross:(head.x - 2),
+    dangerZoneAcross: (head.x - 2),
     dangerZoneUp: (head.y + 1),
     dangerZoneDown: (head.y - 1),
   };
@@ -172,17 +164,17 @@ function findAvailableMoves(head, position, height, width, snakes) {
 }
 
 function findNearestFood(head, food) {
-  var nearestFood;
-  var shortestDistance;
+  let nearestFood;
+  let shortestDistance;
 
-  for(var item of food) {
-    var distance = Math.sqrt(Math.pow((head.x-item.x), 2) + Math.pow((head.y - item.y), 2));
+  for(const item of food) {
+    const distance = Math.sqrt(Math.pow((head.x-item.x), 2) + Math.pow((head.y - item.y), 2));
     if(distance < shortestDistance || shortestDistance === undefined) {
       shortestDistance = distance;
       nearestFood = item;
     }
   }
-  return  nearestFood
+  return nearestFood;
 }
 
 function goToFood(moves, food, position) {
@@ -205,32 +197,27 @@ function goToFood(moves, food, position) {
 }
 
 function handleMove(request, response) {
-  var gameData = request.body
+  const gameData = request.body
 
-  var head = gameData.you.head;
-  var position = gameData.you.body;
-  var length = gameData.you.body.length;
-  var height = gameData.board.height;
-  var width = gameData.board.width;
-  var food = gameData.board.food;
-  var snakes = gameData.board.snakes;
-  var health = gameData.you.health;
+  const head = gameData.you.head;
+  const position = gameData.you.body;
+  const length = gameData.you.body.length;
+  const height = gameData.board.height;
+  const width = gameData.board.width;
+  const food = gameData.board.food;
+  const snakes = gameData.board.snakes;
+  const health = gameData.you.health;
 
-  var possibleMoves = findAvailableMoves(head, position, height, width, snakes);
-  var targetFood = findNearestFood(head, food);
-  var bestMoves = goToFood(possibleMoves, targetFood, head);
-  var move = "";
+  const possibleMoves = findAvailableMoves(head, position, height, width, snakes);
+  const targetFood = findNearestFood(head, food);
+  const bestMoves = goToFood(possibleMoves, targetFood, head);
 
-  if(bestMoves.length !== 0) {
-    move = bestMoves[Math.floor(Math.random() * bestMoves.length)];
-  } else {
-    move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-  }
+  const move = (bestMoves.length !== 0) ? bestMoves[Math.floor(Math.random() * bestMoves.length)] : possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
 
   console.log('MOVE: ' + move)
   response.status(200).send({
     move: move
-  })
+  });
 }
 
 function handleEnd(request, response) {
