@@ -1,6 +1,6 @@
 # Arimame's [Battlesnake](http://play.battlesnake.com)
 
-This is a web server create with Node.js to play [Battlesnake](http://play.battlesnake.com) online and compete with others.
+This is a web server created with Node.js to play [Battlesnake](http://play.battlesnake.com) online and compete with others.
 
 ### Technologies
 
